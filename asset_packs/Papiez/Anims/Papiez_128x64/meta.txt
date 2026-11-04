@@ -1,0 +1,86 @@
+Filetype: Flipper Animation
+Version: 1
+
+Width: 128
+Height: 64
+Passive frames: 2
+Active frames: 2
+Frames order: 0 1 0 1
+Active cycles: 4
+Frame rate: 2
+Duration: 3600
+Active cooldown: 3
+
+Bubble slots: 8
+
+Slot: 0
+X: 83
+Y: 18
+Text: Jeszcze\njak!
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 1
+X: 80
+Y: 14
+Text: Z warko-\nczykami\nczy bez?
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 2
+X: 83
+Y: 24
+Text: nie wiem
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 3
+X: 83
+Y: 18
+Text: Jest\nmozliwe
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 4
+X: 71
+Y: 14
+Text: Jak Pan\nJezus\npowiedzial?
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 5
+X: 83
+Y: 24
+Text: Okrutnik!
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 6
+X: 77
+Y: 14
+Text: Tak Pan\nJezus\npowiedzial
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 7
+X: 72
+Y: 14
+Text: A mozna,\njak\nnajbardziej.
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
