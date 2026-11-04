@@ -18,9 +18,69 @@ PACK_NAME = "Papiez"
 ANIM_NAME = "Papiez_128x64"
 SCREEN_W, SCREEN_H = 128, 64
 
-# Papież lekko na prawo od środka: górne rogi ekranu zajmują ikony paska
-# statusu (po lewej) i bateria (po prawej), lewa strona zostaje na dymek.
-PORTRAIT_X = 44
+# Pasek statusu Momentum rysuje u góry dwie "zakładki": ikony po lewej
+# (do x=42) oraz zegar z baterią po prawej (od x=70), obie do y=12.
+# Czubek głowy stoi w luce między nimi, prawa strona ekranu zostaje na dymki.
+PORTRAIT_X = 28
+
+# Teksty dymków. Po każdym naciśnięciu przycisku Momentum losuje jeden.
+# "\n" łamie linię. Polskie znaki są zamieniane na łacińskie, bo font
+# Flippera ich nie ma.
+TEKSTY = [
+    "Jeszcze\njak!",
+    "Z warko-\nczykami\nczy bez?",
+    "nie wiem",
+    "Jest\nmożliwe",
+    "Jak Pan\nJezus\npowiedział?",
+    "Okrutnik!",
+    "Tak Pan\nJezus\npowiedział",
+    "A można,\njak\nnajbardziej.",
+]
+
+# Dymek staje na prawo od twarzy (x=83); szerszy przesuwa się w lewo tak,
+# żeby nie wyjść za ekran. Pionowo: środek na wysokości oczu, ale nie
+# wyżej niż pod paskiem statusu.
+BUBBLE_X = 83
+BUBBLE_CENTER_Y = 31
+STATUS_BAR_BOTTOM = 13
+
+# Font dymków (FontSecondary = haxrcorp4089): przesunięcie po każdym znaku
+# i szerokość ostatniego znaku, dla ASCII 32..126 (jedna cyfra na znak).
+# Wysokość linii 11 px, ramka dymka: tekst + 8 px szerokości, + 4 px wysokości.
+_FONT_ADV = "22466872446636286366666666234646966666666266686666666668666484664555553552352855554445585554247"
+_FONT_LAST = "21355761335525175255555555123535855555555155575555555557555373553444442441241744443334474443136"
+FONT_LINE_H = 11
+
+_PL = str.maketrans("ąćęłńóśźżĄĆĘŁŃÓŚŹŻ", "acelnoszzACELNOSZZ")
+
+
+def to_ascii(text):
+    out = text.translate(_PL)
+    if not all(32 <= ord(c) < 127 or c == "\n" for c in out):
+        raise ValueError(f"znak spoza ASCII w tekście dymka: {text!r}")
+    return out
+
+
+def text_width(line):
+    """Szerokość linii w pikselach, jak u8g2_GetStrWidth."""
+    if not line:
+        return 0
+    adv = [int(_FONT_ADV[ord(c) - 32]) for c in line]
+    return sum(adv[:-1]) + int(_FONT_LAST[ord(line[-1]) - 32])
+
+
+def bubble_box(text):
+    """(szerokość, wysokość) ramki dymka jak w elements_bubble_str."""
+    lines = text.split("\n")
+    return max(text_width(l) for l in lines) + 8, FONT_LINE_H * len(lines) + 4
+
+
+def place_bubble(text):
+    w, h = bubble_box(text)
+    x = min(BUBBLE_X, SCREEN_W - w)
+    y = max(STATUS_BAR_BOTTOM + 1, min(SCREEN_H - h, BUBBLE_CENTER_Y - h // 2))
+    return x, y
+
 
 MANIFEST = """\
 Filetype: Flipper Animation Manifest
@@ -37,31 +97,48 @@ Weight: 3
 # 2 klatki pasywne (lekkie kiwanie głową). Po naciśnięciu przycisku:
 # te same 2 klatki x 4 cykle z dymkiem. Numery klatek dymka liczone są
 # od początku: pasywne 0-1, aktywne 2-9.
-META = """\
+PASSIVE_FRAMES, ACTIVE_FRAMES, ACTIVE_CYCLES = 2, 2, 4
+
+META_HEAD = """\
 Filetype: Flipper Animation
 Version: 1
 
 Width: {w}
 Height: {h}
-Passive frames: 2
-Active frames: 2
+Passive frames: {passive}
+Active frames: {active}
 Frames order: 0 1 0 1
-Active cycles: 4
+Active cycles: {cycles}
 Frame rate: 2
 Duration: 3600
 Active cooldown: 3
 
-Bubble slots: 1
-
-Slot: 0
-X: 1
-Y: 20
-Text: Szczesc\\nBoze!
-AlignH: Right
-AlignV: Center
-StartFrame: 2
-EndFrame: 9
+Bubble slots: {slots}
 """
+
+META_SLOT = """
+Slot: {slot}
+X: {x}
+Y: {y}
+Text: {text}
+AlignH: Left
+AlignV: Center
+StartFrame: {start}
+EndFrame: {end}
+"""
+
+
+def make_meta(texts=TEKSTY):
+    meta = META_HEAD.format(w=SCREEN_W, h=SCREEN_H, passive=PASSIVE_FRAMES,
+                            active=ACTIVE_FRAMES, cycles=ACTIVE_CYCLES, slots=len(texts))
+    start = PASSIVE_FRAMES
+    end = PASSIVE_FRAMES + ACTIVE_FRAMES * ACTIVE_CYCLES - 1
+    for slot, raw in enumerate(texts):
+        text = to_ascii(raw)
+        x, y = place_bubble(text)
+        meta += META_SLOT.format(slot=slot, x=x, y=y, text=text.replace("\n", "\\n"),
+                                 start=start, end=end)
+    return meta
 
 
 def load_portrait(path):
@@ -142,7 +219,7 @@ def build(root=HERE):
     anim_dir = anims / ANIM_NAME
     anim_dir.mkdir(parents=True, exist_ok=True)
     (anims / "manifest.txt").write_text(MANIFEST.format(name=ANIM_NAME), encoding="ascii")
-    (anim_dir / "meta.txt").write_text(META.format(w=SCREEN_W, h=SCREEN_H), encoding="ascii")
+    (anim_dir / "meta.txt").write_text(make_meta(), encoding="ascii")
     for i, frame in enumerate(frames):
         (anim_dir / f"frame_{i}.bm").write_bytes(encode_bm(frame))
 

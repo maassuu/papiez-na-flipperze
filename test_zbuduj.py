@@ -92,15 +92,68 @@ class BuildTest(unittest.TestCase):
         for name in files:
             self.assertLessEqual((self.anim_dir / name).stat().st_size, 16 * 64 + 1)
 
-    def test_bubble_covers_whole_active_phase(self):
+    def slots(self):
+        text = (self.anim_dir / "meta.txt").read_text()
+        blocks = text.split("\nSlot: ")[1:]
+        return [dict(re.findall(r"^([A-Za-z ]+): (.*)$", "Slot: " + b, re.M)) for b in blocks]
+
+    def test_one_slot_per_text(self):
+        meta = self.fields(self.anim_dir / "meta.txt")
+        slots = self.slots()
+        self.assertEqual(int(meta["Bubble slots"]), len(zbuduj.TEKSTY))
+        self.assertEqual([int(s["Slot"]) for s in slots], list(range(len(zbuduj.TEKSTY))))
+        self.assertIn("A mozna,\\njak\\nnajbardziej.", [s["Text"] for s in slots])
+
+    def test_bubbles_cover_whole_active_phase(self):
         meta = self.fields(self.anim_dir / "meta.txt")
         passive, active = int(meta["Passive frames"]), int(meta["Active frames"])
         cycles = int(meta["Active cycles"])
-        self.assertEqual(int(meta["StartFrame"]), passive)
-        self.assertEqual(int(meta["EndFrame"]), passive + active * cycles - 1)
-        self.assertEqual(int(meta["Bubble slots"]), 1)
-        # tylko ASCII - fonty Flippera nie mają polskich znaków
-        self.assertTrue(meta["Text"].isascii())
+        for s in self.slots():
+            self.assertEqual(int(s["StartFrame"]), passive)
+            self.assertEqual(int(s["EndFrame"]), passive + active * cycles - 1)
+            # tylko ASCII - fonty Flippera nie mają polskich znaków
+            self.assertTrue(s["Text"].isascii())
+
+    def test_bubbles_fit_screen_below_status_bar(self):
+        for s in self.slots():
+            text = s["Text"].replace("\\n", "\n")
+            w, h = zbuduj.bubble_box(text)
+            x, y = int(s["X"]), int(s["Y"])
+            with self.subTest(text=text):
+                self.assertGreaterEqual(y, zbuduj.STATUS_BAR_BOTTOM + 1)
+                self.assertLessEqual(y + h, 64)
+                self.assertLessEqual(x + w, 128)
+                # ogonek (4 px w lewo) nie wchodzi głęboko w twarz
+                self.assertGreaterEqual(x - 4, 66)
+
+
+class BubbleTextTest(unittest.TestCase):
+    def test_polish_letters_become_ascii(self):
+        self.assertEqual(zbuduj.to_ascii("Jest możliwe, Pan Jezus powiedział"),
+                         "Jest mozliwe, Pan Jezus powiedzial")
+        self.assertEqual(zbuduj.to_ascii("ĄĆĘŁŃÓŚŹŻ ąćęłńóśźż"), "ACELNOSZZ acelnoszz")
+
+    def test_rejects_other_non_ascii(self):
+        with self.assertRaises(ValueError):
+            zbuduj.to_ascii("Szczęść Boże ✝")
+
+    def test_width_matches_font(self):
+        # wartości zmierzone na fontcie haxrcorp4089 z firmware Momentum
+        self.assertEqual(zbuduj.text_width("Szczesc"), 34)
+        self.assertEqual(zbuduj.text_width("powiedzial?"), 49)
+        self.assertEqual(zbuduj.text_width("Jeszcze jak!"), 51)
+        self.assertEqual(zbuduj.text_width("warkoczykami"), 61)
+        self.assertEqual(zbuduj.text_width(""), 0)
+
+    def test_bubble_box(self):
+        # elements_bubble_str: szerokość tekstu + 8, 11 px na linię + 4
+        self.assertEqual(zbuduj.bubble_box("Jeszcze\njak!"), (42, 26))
+        self.assertEqual(zbuduj.bubble_box("nie wiem"), (44, 15))
+
+    def test_wide_bubble_shifts_left_to_stay_on_screen(self):
+        x, y = zbuduj.place_bubble("Jak Pan\nJezus\npowiedzial?")
+        self.assertEqual((x, y), (71, 14))
+        self.assertEqual(zbuduj.place_bubble("nie wiem"), (83, 24))
 
 
 if __name__ == "__main__":
