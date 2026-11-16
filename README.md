@@ -11,18 +11,17 @@ z tekstów, wybierany losowo.
 
 ## Co mówi papież
 
-| | |
-|---|---|
-| ![Jeszcze jak!](docs/ekran_jeszcze_jak.png) | ![Jak Pan Jezus powiedział?](docs/ekran_jak_pan_jezus.png) |
-| ![Jest możliwe](docs/ekran_jest_mozliwe.png) | |
+![Jeszcze jak!](docs/ekran_jeszcze_jak.png)
 
-*Zrzuty ekranu z Flippera.*
+*Zrzut ekranu z Flippera.*
 
 Wszystkie teksty:
 
 - Jeszcze jak!
 - Z warkoczykami czy bez?
 - nie wiem
+- Najlepiej lubić wszystkie!
+- Nie dali mi
 - Jest możliwe
 - Jak Pan Jezus powiedział?
 - Okrutnik!
@@ -34,8 +33,6 @@ Wszystkie teksty:
 *Wszystkie dymki narysowane fontem Flippera (symulacja, pasek statusu wzięty ze
 zrzutu ekranu).*
 
-Fonty Flippera nie mają polskich znaków, dlatego na ekranie jest „mozliwe”
-i „powiedzial”.
 
 ## Instalacja
 
