@@ -11,7 +11,7 @@ Frame rate: 2
 Duration: 3600
 Active cooldown: 3
 
-Bubble slots: 8
+Bubble slots: 10
 
 Slot: 0
 X: 83
@@ -41,6 +41,24 @@ StartFrame: 2
 EndFrame: 9
 
 Slot: 3
+X: 77
+Y: 14
+Text: Najlepiej\nlubic\nwszystkie!
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 4
+X: 80
+Y: 24
+Text: Nie dali mi
+AlignH: Left
+AlignV: Center
+StartFrame: 2
+EndFrame: 9
+
+Slot: 5
 X: 83
 Y: 18
 Text: Jest\nmozliwe
@@ -49,7 +67,7 @@ AlignV: Center
 StartFrame: 2
 EndFrame: 9
 
-Slot: 4
+Slot: 6
 X: 71
 Y: 14
 Text: Jak Pan\nJezus\npowiedzial?
@@ -58,7 +76,7 @@ AlignV: Center
 StartFrame: 2
 EndFrame: 9
 
-Slot: 5
+Slot: 7
 X: 83
 Y: 24
 Text: Okrutnik!
@@ -67,7 +85,7 @@ AlignV: Center
 StartFrame: 2
 EndFrame: 9
 
-Slot: 6
+Slot: 8
 X: 77
 Y: 14
 Text: Tak Pan\nJezus\npowiedzial
@@ -76,7 +94,7 @@ AlignV: Center
 StartFrame: 2
 EndFrame: 9
 
-Slot: 7
+Slot: 9
 X: 72
 Y: 14
 Text: A mozna,\njak\nnajbardziej.

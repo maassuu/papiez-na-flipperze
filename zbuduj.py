@@ -30,6 +30,8 @@ TEKSTY = [
     "Jeszcze\njak!",
     "Z warko-\nczykami\nczy bez?",
     "nie wiem",
+    "Najlepiej\nlubić\nwszystkie!",
+    "Nie dali mi",
     "Jest\nmożliwe",
     "Jak Pan\nJezus\npowiedział?",
     "Okrutnik!",
